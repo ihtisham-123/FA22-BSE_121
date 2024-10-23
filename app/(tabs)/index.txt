@@ -1,0 +1,93 @@
+import { StyleSheet,ScrollView, View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { useState,useEffect } from 'react';
+
+export default function HomeScreen() {
+  const [counter, setCounter] = useState(0);
+  const [name, setName] = useState('');
+  const [secondcount, setsecondcount] = useState(0)
+  const change = () => {
+    setCounter((prev)=>prev+1);
+  };
+  const secondchange=()=>{
+    setsecondcount(secondcount+5)
+  }
+
+  const changeName = (text:string) => {
+    setName(text);
+  };
+//useeffect with no array
+  useEffect(()=>{
+    document.title=`${counter} paper prep`
+
+  })
+//useeffect with array with run when the oage is render one time for api calling data fetiching
+  useEffect(()=>{
+    document.title=`${counter}: paper prep`
+
+  },[])
+
+  //useeffect with variable to change the stat  e
+  useEffect(()=>{
+    document.title=`${secondcount}: paper prep`
+
+  },[secondcount])
+
+  return (
+    <>
+    <ScrollView>
+
+    
+      <View style={styles.container}>
+        <Text>{name} has clicked :{counter} times</Text>
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your name"
+          onChangeText={changeName}
+          value={name}
+        />
+
+        <TouchableOpacity onPress={change} style={styles.button}>
+          <Text>Button</Text>
+        </TouchableOpacity>
+      </View>
+
+
+
+<View style={styles.container}>
+        <Text>{name} has clicked  on second count :{secondcount} times</Text>
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your name"
+          onChangeText={changeName}
+          value={name}
+        />
+
+        <TouchableOpacity onPress={secondchange} style={styles.button}>
+          <Text>Button</Text>
+        </TouchableOpacity>
+      </View>
+      </ScrollView>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginVertical: 20,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: 'lightblue',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+});
