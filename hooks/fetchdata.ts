@@ -1,28 +1,28 @@
 import { useState, useEffect } from 'react';
 
-function fetchfood({ url }:any) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true); // Optional loading state
-  const [error, setError] = useState(null);     // Optional error state
+function fetchdata({ url }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const getDataFromApi = () => {
-    return fetch(url)
-      .then(response => response.json())
-      .then(json => {
-        setData(json);  // Assuming the response is a list of products
+    fetch(url)
+      .then((response) => response.json())
+      .then((json) => {
+        setData(json); // Set the entire response
         setLoading(false); // Stop loading once data is fetched
       })
-      .catch(error => {
-        setError(error);
-        setLoading(false); // Stop loading even if there's an error
+      .catch((err) => {
+        setError(err);
+        setLoading(false); // Stop loading if an error occurs
       });
   };
 
   useEffect(() => {
-    getDataFromApi();
-  }, [url]); // Ensure it runs when the URL changes
+    getDataFromApi(); // Fetch data when the component mounts or when the URL changes
+  }, [url]);
 
-  return { data, loading, error }; // Return data, loading, and error state
+  return { data, loading, error }; // Return the data, loading, and error states
 }
 
-export default fetchfood;
+export default fetchdata;
