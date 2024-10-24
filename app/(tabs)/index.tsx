@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import fetchdata from '@/hooks/fetchdata'; // Custom hook
 
 export default function HomeScreen() {
-  // Fetch data from the API
-  const { data, loading, error } = fetchdata({ url: 'https://api.alquran.cloud/v1/surah' });
+  const [expandedSurah, setExpandedSurah] = useState(null);
+
+  // Fetch data from the API or local storage
+  const { data, loading, error } = fetchdata({ url: 'https://api.alquran.cloud/v1/quran/en.asad' });
 
   // Display a loading screen
   if (loading) {
@@ -24,19 +26,37 @@ export default function HomeScreen() {
     );
   }
 
-  // Function to render each Surah item
+  // Function to toggle the visibility of Surah content
+  const toggleSurah = (number) => {
+    setExpandedSurah(expandedSurah === number ? null : number);
+  };
+
+  // Function to render each Surah item and its verses
   const renderSurahItem = ({ item }) => (
     <View style={styles.surahCard}>
-      <View style={styles.surahLeft}>
-        <View style={styles.surahNumberContainer}>
-          <Text style={styles.surahNumber}>{item.number}</Text>
+      <TouchableOpacity onPress={() => toggleSurah(item.number)}>
+        <View style={styles.surahLeft}>
+          <View style={styles.surahNumberContainer}>
+            <Text style={styles.surahNumber}>{item.number}</Text>
+          </View>
+          <View>
+            <Text style={styles.surahName}>{item.englishName}</Text>
+            <Text style={styles.surahDetails}>{item.revelationType} - {item.numberOfAyahs} VERSES</Text>
+          </View>
         </View>
-        <View>
-          <Text style={styles.surahName}>{item.englishName}</Text>
-          <Text style={styles.surahDetails}>{item.revelationType} - {item.numberOfAyahs} VERSES</Text>
+        <Text style={styles.arabicName}>{item.name}</Text>
+      </TouchableOpacity>
+
+      {/* Show verses if the surah is expanded */}
+      {expandedSurah === item.number && (
+        <View style={styles.versesContainer}>
+          {item.ayahs.map(ayah => (
+            <Text key={ayah.number} style={styles.ayahText}>
+              {ayah.numberInSurah}. {ayah.text}
+            </Text>
+          ))}
         </View>
-      </View>
-      <Text style={styles.arabicName}>{item.name}</Text>
+      )}
     </View>
   );
 
@@ -65,7 +85,7 @@ export default function HomeScreen() {
 
       {/* Surah List */}
       <FlatList
-        data={data.data} // Using the 'data' array from the fetched data
+        data={data?.data?.surahs || []} // Using the 'surahs' array from the fetched data
         renderItem={renderSurahItem}
         keyExtractor={item => item.number.toString()}
         contentContainerStyle={styles.surahList}
@@ -178,6 +198,13 @@ const styles = StyleSheet.create({
   arabicName: {
     fontSize: 20,
     color: '#6c63ff',
+  },
+  versesContainer: {
+    marginTop: 10,
+  },
+  ayahText: {
+    fontSize: 14,
+    marginBottom: 5,
   },
   surahList: {
     paddingBottom: 20,
